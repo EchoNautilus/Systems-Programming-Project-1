@@ -52,12 +52,65 @@ struct processes {
 
 struct readyQueue{
     int number_of_processes_in_queue;
-    int processes_in_queue;
+    int processes_in_queue[MAX_RUNNING_PROCESSES]; // Use an array to store process IDs
 };
+
+// Enqueue function for readyQueue
+
+void enqueueReady(struct readyQueue *queue, int process_id) { // Declare enqueue function with a pointer to readyQueue struct, and process ID
+    if (queue->number_of_processes_in_queue < MAX_RUNNING_PROCESSES) { // Check if queue is full
+        queue->processes_in_queue[queue->number_of_processes_in_queue] = process_id; // Add process ID to the end of the queue
+        queue->number_of_processes_in_queue++; // Increment number of processes in queue
+    }
+}
+
+// Dequeue function for readyQueue
+
+int dequeueReady(struct readyQueue *queue){ // Declare dequeue function with pointer to readyQueue struct. No need to pass process ID as parameter because it will be removed from the queue
+    if (queue->number_of_processes_in_queue > 0) { // Check if there are processes in the queue
+        int process_id = queue->processes_in_queue[0]; // Get process ID from the front of the queue
+        for (int i = 1; i < queue->number_of_processes_in_queue; i++) { // Shift remaining processes to the left
+            queue->processes_in_queue[i - 1] = queue->processes_in_queue[i]; 
+        }
+        queue->number_of_processes_in_queue--; // Decrement number of processes in queue
+        return process_id; // Return process ID
+    }
+    return -1; // Return -1 if queue is empty
+}
 
 struct blockedQueue{
     int number_of_processes_in_queue;
-    int processes_in_queue;
+    int processes_in_queue[MAX_RUNNING_PROCESSES]; // Use an array to store process IDs
+};
+
+// Enqueue function for blockedQueue
+
+void enqueueBlocked(struct blockedQueue *queue, int process_id) { // Declare enqueue function with a pointer to blockedQueue struct, and process ID
+    if (queue->number_of_processes_in_queue < MAX_RUNNING_PROCESSES) { // Check if queue is full
+        queue->processes_in_queue[queue->number_of_processes_in_queue] = process_id; // Add process ID to the end of the queue
+        queue->number_of_processes_in_queue++; // Increment number of processes in queue
+    }
+}
+
+// Dequeue function for blockedQueue
+
+int dequeueBlocked(struct blockedQueue *queue){ // Declare dequeue function with pointer to blockedQueue struct. No need to pass process ID as parameter because it will be removed from the queue
+    if (queue->number_of_processes_in_queue > 0) { // Check if there are processes in the queue
+        int process_id = queue->processes_in_queue[0]; // Get process ID from the front of the queue
+        for (int i = 1; i < queue->number_of_processes_in_queue; i++) { // Shift remaining processes to the left
+            queue->processes_in_queue[i - 1] = queue->processes_in_queue[i]; 
+        }
+        queue->number_of_processes_in_queue--; // Decrement number of processes in queue
+        return process_id; // Return process ID
+    }
+    return -1; // Return -1 if queue is empty
+}
+
+struct devices {
+    int time_to_transfer_one_byte;
+    int number_of_bytes_to_transfer;
+    int number_of_bytes_transferred;
+    int process_id_using_device;
 };
 
 struct cpu {
