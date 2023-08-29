@@ -1,0 +1,11 @@
+System configuration
+Consider the following sample sysconfig file which defines the characteristics of our hardware and the time-quantum for scheduling. Note that lines commencing with a '#' are comment lines, and the 'words' on each line may be separated by one-or-more space or tab characters. All speeds are in bytes-per-second (Bps), all times are in microseconds (usecs), and all I/O sizes are in bytes (B). We may assume that the format of the sysconfig file will always be correct, so we do not need to check for errors.
+
+#            devicename   readspeed      writespeed
+#
+device       usb3.1       640000000Bps   640000000Bps
+device       terminal     10Bps          3000000Bps
+device       hd           160000000Bps   80000000Bps
+device       ssd          480000000Bps   420000000Bps
+#
+timequantum  100usec

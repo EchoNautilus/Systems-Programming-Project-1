@@ -106,13 +106,6 @@ int dequeueBlocked(struct blockedQueue *queue){ // Declare dequeue function with
     return -1; // Return -1 if queue is empty
 }
 
-struct devices {
-    int time_to_transfer_one_byte;
-    int number_of_bytes_to_transfer;
-    int number_of_bytes_transferred;
-    int process_id_using_device;
-};
-
 struct cpu {
     int id_of_process_currently_using_the_cpu;
     int time_spent_on_the_cpu;

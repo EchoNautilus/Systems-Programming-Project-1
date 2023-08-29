@@ -1,0 +1,27 @@
+#
+shortsleep
+← tab →10usecs    sleep   1000000usecs
+← tab →50usecs    exit
+#
+longsleep
+← tab →10usecs    sleep   5000000usecs
+← tab →50usecs    exit
+#
+cal
+← tab →80usecs    write   terminal 2000B
+← tab →90usecs    exit
+#
+copyfile
+← tab →200usecs   read    hd       48000B
+← tab →300usecs   write   hd       48000B
+← tab →600usecs   read    hd       21000B
+← tab →700usecs   write   hd       21000B
+← tab →1000usecs  exit
+#
+shell
+← tab →100usecs   write   terminal 10B
+← tab →120usecs   read    terminal 4B
+← tab →220usecs   spawn   cal
+← tab →230usecs   wait
+← tab →1000usecs  exit
+#
