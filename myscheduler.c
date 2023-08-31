@@ -45,18 +45,19 @@
 
 // Define data structures for processes, devices, queues, etc.
 
-struct processes {
-    int state;
-    int time_spent_on_cpu;
+struct processes { // Declare struct for processes
+    int state; // Declare state variable
+    int time_spent_on_cpu; // Declare time spent on CPU variable
 };
 
-struct readyQueue{
-    int number_of_processes_in_queue;
+// ----------------------------------------------------------------------
+
+struct readyQueue{ // Declare struct for ready queue
+    int number_of_processes_in_queue; // Declare variable to store number of processes in queue
     int processes_in_queue[MAX_RUNNING_PROCESSES]; // Use an array to store process IDs
 };
 
 // Enqueue function for readyQueue
-
 void enqueueReady(struct readyQueue *queue, int process_id) { // Declare enqueue function with a pointer to readyQueue struct, and process ID
     if (queue->number_of_processes_in_queue < MAX_RUNNING_PROCESSES) { // Check if queue is full
         queue->processes_in_queue[queue->number_of_processes_in_queue] = process_id; // Add process ID to the end of the queue
@@ -65,7 +66,6 @@ void enqueueReady(struct readyQueue *queue, int process_id) { // Declare enqueue
 }
 
 // Dequeue function for readyQueue
-
 int dequeueReady(struct readyQueue *queue){ // Declare dequeue function with pointer to readyQueue struct. No need to pass process ID as parameter because it will be removed from the queue
     if (queue->number_of_processes_in_queue > 0) { // Check if there are processes in the queue
         int process_id = queue->processes_in_queue[0]; // Get process ID from the front of the queue
@@ -78,13 +78,13 @@ int dequeueReady(struct readyQueue *queue){ // Declare dequeue function with poi
     return -1; // Return -1 if queue is empty
 }
 
-struct blockedQueue{
-    int number_of_processes_in_queue;
+// ----------------------------------------------------------------------
+struct blockedQueue{ // Declare struct for blocked queue
+    int number_of_processes_in_queue; // Declare variable to store number of processes in queue
     int processes_in_queue[MAX_RUNNING_PROCESSES]; // Use an array to store process IDs
 };
 
 // Enqueue function for blockedQueue
-
 void enqueueBlocked(struct blockedQueue *queue, int process_id) { // Declare enqueue function with a pointer to blockedQueue struct, and process ID
     if (queue->number_of_processes_in_queue < MAX_RUNNING_PROCESSES) { // Check if queue is full
         queue->processes_in_queue[queue->number_of_processes_in_queue] = process_id; // Add process ID to the end of the queue
@@ -93,7 +93,6 @@ void enqueueBlocked(struct blockedQueue *queue, int process_id) { // Declare enq
 }
 
 // Dequeue function for blockedQueue
-
 int dequeueBlocked(struct blockedQueue *queue){ // Declare dequeue function with pointer to blockedQueue struct. No need to pass process ID as parameter because it will be removed from the queue
     if (queue->number_of_processes_in_queue > 0) { // Check if there are processes in the queue
         int process_id = queue->processes_in_queue[0]; // Get process ID from the front of the queue
@@ -106,23 +105,76 @@ int dequeueBlocked(struct blockedQueue *queue){ // Declare dequeue function with
     return -1; // Return -1 if queue is empty
 }
 
-struct cpu {
-    int id_of_process_currently_using_the_cpu;
-    int time_spent_on_the_cpu;
+// ----------------------------------------------------------------------
+struct cpu { // Declare struct for CPU
+    int id_of_process_currently_using_the_cpu; // Declare variable to store ID of process currently using the CPU
+    int time_spent_on_the_cpu; // Declare variable to store time spent on the CPU
 };
 
-// Define constants for states
+// ----------------------------------------------------------------------
 
-void spawn() {
-    // Create a new process.
-    pid_t pid = fork();
-    // Add the process to the ready queue.
-    pthread_create(&pid, NULL, NULL, NULL);
+void read_sysconfig(char argv0[], char filename[]){ // Declare function to read sysconfig file
+    FILE *file = fopen(filename, "r"); // Opening the file.
+
+    if (file == NULL){ // Check if the file exists.
+        fprintf(stderr, "Error opening file %s\n", filename); // Print error message if the file does not exist.
+        return; // Exit the function if the file does not exist. Because it's void, it doesn't return anything.
+    }
+    // Read the file line by line.
+    char line[100]; // Declare line variable (token size is 100)
+
+    while (fgets(line, sizeof(line), file) != NULL ){ // Read each line
+        char *token = strtok(line, "  \t\n"); // Split line into tokens
+        while (token != NULL) { // Print each token
+            printf("%s\n", token); // Print token
+            token = strtok(NULL, " "); // Get next token
+        }
+    }
+    fclose(file); // Close file
+    return;
 }
 
-void read() {
-    // Read from a device.
-    // Add the process to the blocked queue.
+void read_commands(char argv0[], char filename[]) { // Declare function to read command file
+    FILE *file = fopen(filename, "r"); // Open file
+    if (file == NULL) { // Check if file exists
+        fprintf(stderr, "Error opening file %s\n", filename);
+        return; 
+    }
+    char line[100]; // Declare line variable (token size is 100)
+
+    while (fgets(line, sizeof(line), file) != NULL) { // Read each line
+        // Tokenize the line to separate command and system calls
+        char *command = strtok(line, " \t\n"); // Split line into tokens
+        if (command == NULL) { // Check if line is empty
+            continue; // Skip empty lines
+        }
+
+        // Process the command and its associated system calls
+        printf("Command: %s\n", command); // Print command
+        char *syscall = strtok(NULL, " \t\n"); // Get first system call
+        while (syscall != NULL) { // Print each system call
+            printf("System Call: %s\n", syscall); // Print system call
+            // Implement logic to execute the system call
+            syscall = strtok(NULL, " \t\n"); // Get next system call
+        }
+    }
+    fclose(file); // Close file
+    return;
+}
+
+//  ----------------------------------------------------------------------
+
+// Commands to be executed
+
+void read(struct cpu *cpu, struct blockedQueue *blocked_queue, struct processes *processes_array, int process_id, char *device_name, int bytes_to_read) { // Declare read function
+    cpu->time_spent_on_the_cpu += TIME_CONTEXT_SWITCH; // Simulate context switch time (time passing, 5 microseconds)
+
+    printf("Process %d is reading %d bytes from device %s\n", process_id, bytes_to_read, device_name); // Perform the read operation (for simulation purposes)
+
+    cpu->time_spent_on_the_cpu += bytes_to_read; // Simulate time to read from device (time passing, 1 microsecond per byte)
+
+    enqueueBlocked(blocked_queue, process_id); // Add the process to the blocked queue
+    processes_array[process_id].state = BLOCKED; // Change the state of the process to blocked
 }
 
 void write() {
@@ -145,19 +197,12 @@ void exit() {
     // Remove the process.
 }
 
-void read_sysconfig(char argv0[], char filename[])
-{
-}
-
-void read_commands(char argv0[], char filename[])
-{
-}
-
 //  ----------------------------------------------------------------------
 
-void execute_commands(void)
-{
+void execute_commands(void){
+    
 }
+
 
 //  ----------------------------------------------------------------------
 
