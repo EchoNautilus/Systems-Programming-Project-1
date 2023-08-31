@@ -47,7 +47,7 @@
 
 struct processes { // Declare struct for processes
     int state; // Declare state variable
-    int time_spent_on_cpu; // Declare time spent on CPU variable
+    int time_spent_on_the_cpu; // Declare time spent on CPU variable
 };
 
 // ----------------------------------------------------------------------
@@ -200,9 +200,10 @@ void exit() {
 //  ----------------------------------------------------------------------
 
 void execute_commands(void){
-    
+    // Use a while loop to execute the commands until there are no more commands left.
+    // Use a for loop to execute the commands.
+    // Use a switch statement to execute the commands.
 }
-
 
 //  ----------------------------------------------------------------------
 
