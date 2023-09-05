@@ -91,25 +91,30 @@ void read_sysconfig(char argv0[], char filename[]){ // Read the sysconfig file
     struct Device devices[100]; // Declare an array to store multiple devices
     int num_devices = 0; // Initialize the number of devices to 0
 
-    int time_quantum = DEFAULT_TIME_QUANTUM; // Declaring time quantum. No need to parse the file as it is already a constant
+    int time_quantum; // Declaring time quantum, ignoring default value for now
     
     char line[100]; // Declaring line
-    while (fgets(line, sizeof(line), file) != NULL){ // Loop while there are lines in the file
+    while (fgets(line, sizeof(line), file) != NULL) { // Loop while there are lines in the file
         if (line[0] == CHAR_COMMENT) { // Skip lines that start with #
             continue;
         }
         else if (strncmp(line, "device", 6) == 0) { // Check if the line starts with "device"
             struct Device new_device; // Declare a new device
-            if (sscanf(line, "device %19s %ldBps %ldBps", 
+            if (sscanf(line, "device %19s %ldBps %ldBps",
                        new_device.devicename, &new_device.readspeed, &new_device.writespeed) == 3) { // Check if the line has 3 arguments
                 devices[num_devices++] = new_device; // Add the new device to the array of devices
-            } else {
-                fprintf(stderr, "Error parsing device line: %s", line);
+            } else { // If the line does not have 3 arguments
+                fprintf(stderr, "Error parsing device line: %s", line);  // Print error message
+            }
+        }
+        else if (strncmp(line, "timequantum", 10) == 0) { // Check if the current line starts with "timequantum"
+            if (sscanf(line, "timequantum %dusec", &time_quantum) != 1) { // If parsing succeeds (has 1 argument), store the time quantum
+                fprintf(stderr, "Error parsing timequantum line: %s", line); // If not, print error message
             }
         }
     }
     fclose(file);
-    return
+    return;
 }
 
 // code to be tested and understood                                                 TODO
