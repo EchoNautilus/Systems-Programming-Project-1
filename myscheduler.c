@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //  CITS2002 Project 1 2023
 //  Student1: 22974799 Samuel Chew
@@ -71,32 +72,45 @@ int dequeue(struct Queue *queue){
     return -1;
 }
 
-
-
-
-
+struct Device { // Struct for devices
+    char devicename[MAX_DEVICE_NAME];
+    long readspeed;
+    long writespeed;
+};
 
 // code to be tested                                         TODO
-void read_sysconfig(char argv0[], char filename[]){
+
+void read_sysconfig(char argv0[], char filename[]){ // Read the sysconfig file
     FILE *file = fopen(filename, "r");
 
-    if (file == NULL){
+    if (file == NULL){ // Check if file exists
         fprintf(stderr, "Error opening file %s\n", filename);
         return;
     }
-    char line[100];
 
-    while (fgets(line, sizeof(line), file) != NULL ){
-        char *token = strtok(line, "  \t\n");
-        while (token != NULL) {
-            printf("%s\n", token);
-            token = strtok(NULL, " ");
+    struct Device devices[100]; // Declare an array to store multiple devices
+    int num_devices = 0; // Initialize the number of devices to 0
+
+    int time_quantum = DEFAULT_TIME_QUANTUM; // Declaring time quantum. No need to parse the file as it is already a constant
+    
+    char line[100]; // Declaring line
+    while (fgets(line, sizeof(line), file) != NULL){ // Loop while there are lines in the file
+        if (line[0] == CHAR_COMMENT) { // Skip lines that start with #
+            continue;
+        }
+        else if (strncmp(line, "device", 6) == 0) { // Check if the line starts with "device"
+            struct Device new_device; // Declare a new device
+            if (sscanf(line, "device %19s %ldBps %ldBps", 
+                       new_device.devicename, &new_device.readspeed, &new_device.writespeed) == 3) { // Check if the line has 3 arguments
+                devices[num_devices++] = new_device; // Add the new device to the array of devices
+            } else {
+                fprintf(stderr, "Error parsing device line: %s", line);
+            }
         }
     }
     fclose(file);
-    return;
+    return
 }
-
 
 // code to be tested and understood                                                 TODO
 void read_commands(char argv0[], char filename[]) {

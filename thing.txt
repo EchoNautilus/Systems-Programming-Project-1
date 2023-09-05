@@ -1,0 +1,3 @@
+if has more than 4 devices, fail
+each device is a struct
+if line starts w time_quantum
